@@ -3,6 +3,7 @@ readline = require 'readline'
 
 Request   = require './Request'
 CookieJar = require './CookieJar'
+coffee    = require 'coffee-script'
 
 class RestConsole
 	
@@ -91,6 +92,10 @@ class RestConsole
 			if args.length > 0 then @request.setFormat args[0]
 			if command is 'put' or command is 'post'
 				@getData (data) =>
+					if @request.format is 'json'
+						try
+							data = JSON.stringify coffee.eval data
+						catch e
 					@request.data = data
 					@executeRequest()
 			else
