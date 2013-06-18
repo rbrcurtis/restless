@@ -36,6 +36,7 @@ class Request
 			method:  @method.toUpperCase()
 			path:    encodeURI '/' + @path.join('/')
 			headers: @headers
+			rejectUnauthorized: false
 		
 		unless @cookieJar.isEmpty
 			options.headers['Cookie'] = @cookieJar.toHeader()
