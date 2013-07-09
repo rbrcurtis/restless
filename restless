@@ -6,7 +6,7 @@ RestConsole = require './src/RestConsole'
 require 'colors'
 
 global._       = require 'underscore'
-global.inspect = require('eyes').inspector(maxLength: 10240)
+global.inspect = require('eyes').inspector(maxLength: -1)
 
 if process.argv.length isnt 3
 	console.log 'Usage: restless <url>'
