@@ -19,6 +19,7 @@ config =
 	protocol: if site.protocol then site.protocol.substr(0, site.protocol.length - 1) else null
 	host:     site.hostname
 	port:     site.port
+	path:     site.path
 
 rest = new RestConsole(config)
 rest.start()

@@ -7,10 +7,10 @@ coffee    = require 'coffee-script'
 
 class RestConsole
 	
-	constructor: (config) ->
-		@protocol = config.protocol ? 'http'
-		@host     = config.host     ? 'localhost'
-		@port     = config.port
+	constructor: (@config) ->
+		@protocol = @config.protocol ? 'http'
+		@host     = @config.host     ? 'localhost'
+		@port     = @config.port
 		unless @port?
 			@port = switch @protocol
 				when 'http' then 80
@@ -28,6 +28,8 @@ class RestConsole
 			@showPrompt()
 	
 	start: ->
+		if @config.path?.length
+			@processCommand "cd #{@config.path}"
 		@readline.on 'line', (line) =>
 			@processCommand line.trim()
 			
