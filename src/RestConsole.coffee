@@ -128,7 +128,6 @@ class RestConsole
 	
 	executeRequest: ->
 		@request.execute (response, body) =>
-			console.log 'response', response?.statusCode, body
 			@cookieJar.update(response)
 			@showResponse response, body, =>
 				@reset()

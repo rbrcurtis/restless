@@ -17,13 +17,13 @@ class Request
 		@data += line
 
 	execute: (callback) ->
-		console.log {@data}
 		path = encodeURI '/' + @path.join('/')
 		options =
 			url: "#{@protocol}://#{@host}:#{@port}#{path}"
 			method:  @method.toUpperCase()
 			headers: @headers
 			rejectUnauthorized: false
+			jar: false
 
 		if @format is 'json' then options.json = @data
 		else options.body = @data
