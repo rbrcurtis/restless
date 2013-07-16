@@ -23,8 +23,7 @@ class RestConsole
 		@readline = readline.createInterface(process.stdin, process.stdout)
 		
 		process.on 'uncaughtException', (err) =>
-			console.log 'Uncaught exception:'.red.bold
-			console.log err.toString().red
+			console.error err.message, err.stack
 			@showPrompt()
 	
 	start: ->
@@ -96,7 +95,7 @@ class RestConsole
 				@getData (data) =>
 					if @request.format is 'json'
 						try
-							data = JSON.stringify coffee.eval data
+							data = coffee.eval data
 						catch e
 					@request.data = data
 					@executeRequest()
@@ -129,6 +128,7 @@ class RestConsole
 	
 	executeRequest: ->
 		@request.execute (response, body) =>
+			console.log 'response', response?.statusCode, body
 			@cookieJar.update(response)
 			@showResponse response, body, =>
 				@reset()
@@ -148,7 +148,7 @@ class RestConsole
 		try
 			result = JSON.parse(body)
 		catch ex
-			result = body.trim()
+			result = body.trim?() or body
 		
 		if _.isString(result)
 			if result.length isnt 0

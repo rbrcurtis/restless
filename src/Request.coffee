@@ -1,54 +1,38 @@
-querystring = require 'querystring'
-
-protocols =
-	http:  require 'http'
-	https: require 'https'
-
-contentTypes =
-	json:       'application/json'
-	urlencoded: 'application/x-www-form-urlencoded'
-	xml:        'application/xml'
+request = require 'request'
 
 class Request
 	
-	constructor: (@protocol, @host, @port, @cookieJar, headers = {}) ->
-		@headers = _.extend headers, 
-			'Host': @host
+	constructor: (@protocol, @host, @port, @cookieJar, @headers = {}) ->
 		@setFormat 'json'
 		
 		@data = ""
 	
 	setFormat: (format) ->
 		@format = format
-		@headers['Accept'] = @headers['Content-Type'] = contentTypes[@format]
 	
 	setHeader: (name, value) ->
 		@headers[name] = value
 	
 	addData: (line) ->
 		@data += line
-	
+
 	execute: (callback) ->
-		@headers['content-length'] = Buffer.byteLength @data, 'utf8'
+		console.log {@data}
+		path = encodeURI '/' + @path.join('/')
 		options =
-			host:    @host
-			port:    @port
+			url: "#{@protocol}://#{@host}:#{@port}#{path}"
 			method:  @method.toUpperCase()
-			path:    encodeURI '/' + @path.join('/')
 			headers: @headers
 			rejectUnauthorized: false
+
+		if @format is 'json' then options.json = @data
+		else options.body = @data
 		
 		unless @cookieJar.isEmpty
 			options.headers['Cookie'] = @cookieJar.toHeader()
+
+		request options, (e, r, body) ->
+			callback r, body
 		
-		request = protocols[@protocol].request options, (response) =>
-			body = ''
-			response.setEncoding('utf8')
-			response.on 'data', (chunk) -> body += chunk
-			response.on 'end', -> callback(response, body)
-		
-		request.setTimeout 10000
-		request.write(@data) if @data?
-		request.end()
 
 module.exports = Request
