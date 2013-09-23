@@ -12,7 +12,7 @@ class CookieJar
 	
 	load: ->
 		try
-			for name, obj of JSON.parse fs.readFileSync(@file, 'utf8')
+			for name, obj of JSON.parse(fs.readFileSync(@file, 'utf8') or "{}")
 				@cookies[name] = new Cookie(obj.name, obj.value, obj.options)
 		catch ex
 	
@@ -23,6 +23,7 @@ class CookieJar
 		(cookie.toHeader() for name, cookie of @cookies).join ', '
 			
 	update: (response) ->
+		unless response?.headers? then return
 		headers = response.headers['set-cookie']
 		if headers?
 			for header in headers

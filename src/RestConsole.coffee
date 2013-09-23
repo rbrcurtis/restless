@@ -128,7 +128,7 @@ class RestConsole
 	
 	executeRequest: ->
 		@request.execute (response, body) =>
-			@cookieJar.update(response)
+			if response then @cookieJar.update(response)
 			@showResponse response, body, =>
 				@reset()
 				@showPrompt()
@@ -147,7 +147,7 @@ class RestConsole
 		try
 			result = JSON.parse(body)
 		catch ex
-			result = body.trim?() or body
+			result = body?.trim?() or body
 		
 		if _.isString(result)
 			if result.length isnt 0

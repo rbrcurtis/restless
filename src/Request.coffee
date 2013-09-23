@@ -32,6 +32,7 @@ class Request
 			options.headers['Cookie'] = @cookieJar.toHeader()
 
 		request options, (e, r, body) ->
+			if e then return callback e, e.toString()
 			callback r, body
 		
 
