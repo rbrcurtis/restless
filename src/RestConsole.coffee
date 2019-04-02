@@ -1,6 +1,6 @@
+fs = require 'fs'
 http     = require 'http'
 readline = require 'readline'
-
 Request   = require './Request'
 CookieJar = require './CookieJar'
 coffee    = require 'coffee-script'
@@ -18,7 +18,10 @@ class RestConsole
 
 		@cookieJar = new CookieJar "#{__dirname}/../cookies.json"
 		@path = []
-		@stickyHeaders = {}
+		try
+			@stickyHeaders = require("#{__dirname}/../headers.json")
+		catch error
+			@stickyHeaders = {}
 
 		@readline = readline.createInterface(process.stdin, process.stdout)
 
@@ -50,6 +53,11 @@ class RestConsole
 	reset: ->
 		@request = new Request(@protocol, @host, @port, @cookieJar, @stickyHeaders)
 
+	saveHeaders: ->
+		@stickyHeaders = @request.headers
+		console.log('saveHeaders', __filename, JSON.stringify(@request.headers))
+		fs.writeFileSync("#{__dirname}/../headers.json", JSON.stringify(@request.headers) + "\n")
+
 	processCommand: (line) ->
 		unless line then return @showPrompt()
 		args = line.match /("[^"]+"="[^"]+")|("[^"]+"=[^\s]+)|([^\s]+="[^"]+")|("[^"]+")|([^\s]+)/g
@@ -72,6 +80,7 @@ class RestConsole
 				value = @_trimQuotes value.trim()
 
 				@request.setHeader(name, value)
+				@saveHeaders()
 			else
 				console.log "I don't know how to set #{what.bold}".red
 

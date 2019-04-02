@@ -2,7 +2,7 @@
   "name": "restless",
   "version": "0.0.1",
   "description": "REST inspection console",
-  "preferGlobal": "true",
+  "preferGlobal": true,
   "bin": {
     "restless": "restless"
   },
