@@ -18,10 +18,6 @@ class RestConsole
 
 		@cookieJar = new CookieJar "#{__dirname}/../cookies.json"
 		@path = []
-		try
-			@stickyHeaders = require("#{__dirname}/../headers.json")
-		catch error
-			@stickyHeaders = {}
 
 		@readline = readline.createInterface(process.stdin, process.stdout)
 
@@ -51,11 +47,13 @@ class RestConsole
 		process.exit(0)
 
 	reset: ->
-		@request = new Request(@protocol, @host, @port, @cookieJar, @stickyHeaders)
+		try
+			headers = require("#{__dirname}/../headers.json")
+		catch error
+			headers = {}
+		@request = new Request(@protocol, @host, @port, @cookieJar, headers)
 
 	saveHeaders: ->
-		@stickyHeaders = @request.headers
-		console.log('saveHeaders', __filename, JSON.stringify(@request.headers))
 		fs.writeFileSync("#{__dirname}/../headers.json", JSON.stringify(@request.headers) + "\n")
 
 	processCommand: (line) ->
@@ -92,6 +90,18 @@ class RestConsole
 				inspect(@cookieJar.cookies)
 			else if what is 'headers'
 				inspect(@request.headers)
+			else
+				console.log "I don't know how to show #{what.bold}".red
+
+		else if command is 'clear'
+			what = args?[0]
+			if not what?
+				console.log 'Clear what?'.yellow
+			else if what is 'cookies'
+				@cookieJar.cookies = {}
+			else if what is 'headers'
+				@request.headers = {}
+				@saveHeaders()
 			else
 				console.log "I don't know how to show #{what.bold}".red
 
